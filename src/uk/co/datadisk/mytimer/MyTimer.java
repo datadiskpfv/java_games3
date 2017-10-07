@@ -9,6 +9,10 @@ public class MyTimer extends JFrame {
 
     private static final long serialVersionUID = 6658663244818335767L;
 
+    Font font = new Font(Font.DIALOG, Font.BOLD, 36);
+
+    private TimerPanel timerPanel = new TimerPanel(10, font);
+
     public MyTimer() {
         initGUI();
 
@@ -23,6 +27,10 @@ public class MyTimer extends JFrame {
     private void initGUI() {
         TitleLabel titleLabel = new TitleLabel("My Timer");
         add(titleLabel, BorderLayout.PAGE_START);
+
+        JPanel centerPanel = new JPanel();
+        add(centerPanel, BorderLayout.CENTER);
+        centerPanel.add(timerPanel);
     }
 
     public static void main(String[] args) {
