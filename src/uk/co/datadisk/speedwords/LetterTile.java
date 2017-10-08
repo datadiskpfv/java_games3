@@ -66,4 +66,12 @@ public class LetterTile extends JPanel {
         Dimension size = new Dimension(SIZE, SIZE);
         return size;
     }
+
+    public String getLetter() {
+        return letter;
+    }
+
+    public int getPoints() {
+        return points;
+    }
 }
