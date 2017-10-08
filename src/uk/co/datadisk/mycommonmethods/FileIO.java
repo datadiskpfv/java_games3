@@ -56,6 +56,7 @@ public class FileIO {
                 lines.add(line);
                 line = in.readLine();
             }
+            in.close();
         }  catch (NullPointerException e) {
             String message = fileName + " cannot be found";
             JOptionPane.showMessageDialog(null, message);

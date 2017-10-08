@@ -49,4 +49,31 @@ public class TileSet {
         }
         return contains;
     }
+
+    public String toString() {
+        String s = "";
+        for (int i = 0; i < tiles.size(); i++) {
+            LetterTile tile = tiles.get(i);
+            String s2 =  tile.getLetter();
+            s += s2;
+        }
+        System.out.println("X: " + getX() + " Y: " + getY());
+        return s;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getNumberOfTiles() {
+        return tiles.size();
+    }
+
+    public LetterTile getTile(int i) {
+        return tiles.get(i);
+    }
 }

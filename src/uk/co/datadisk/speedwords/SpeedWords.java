@@ -67,7 +67,7 @@ public class SpeedWords extends JFrame {
 
         JScrollPane scrollPanel = new JScrollPane(textArea);
         Dimension size  = new Dimension(100, 0);
-        scrollPanel.setSize(size);
+        scrollPanel.setPreferredSize(size);
         mainPanel.add(scrollPanel);
     }
 

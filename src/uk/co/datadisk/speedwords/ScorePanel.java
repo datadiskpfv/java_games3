@@ -34,7 +34,7 @@ public class ScorePanel extends JPanel {
     }
 
     public void reset() {
-        score = 0;
+        score = initialScore;
         scoreLabel.setText("" + score);
     }
 }

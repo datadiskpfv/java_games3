@@ -4,6 +4,8 @@ import uk.co.datadisk.mycommonmethods.FileIO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,12 +25,84 @@ public class GamePanel extends JPanel {
     private ArrayList<String> sevenLetterWords = new ArrayList<>();
     private Random rand = new Random();
 
+    private TileSet movingTiles;
+    private int mouseX;
+    private int mouseY;
+
     public GamePanel(SpeedWords speedWords) {
 
         this.speedWords = speedWords;
 
         sevenLetterWords = FileIO.readTextFile(this, FILE_NAME);
         restart();
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                clicked(x,y);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                released();
+            }
+        });
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                dragged(x, y);
+            }
+        });
+    }
+
+    private void dragged(int x, int y) {
+        if( movingTiles != null) {
+            int changeX = x - mouseX;
+            int changeY = y - mouseY;
+            movingTiles.changeXY(changeX, changeY);
+            mouseX = x;
+            mouseY = y;
+            repaint();
+        }
+        repaint();
+    }
+
+    private void released() {
+        // if dropped on other tiles, connect it to the tiles
+        if (movingTiles != null) {
+            String s = movingTiles.toString();
+            int x = movingTiles.getX();
+            int y = movingTiles.getY();
+            TileSet newTileSet = new TileSet(s, x, y);
+            tileSets.add(0,newTileSet);
+            movingTiles = null;
+        }
+        repaint();
+    }
+
+    private void clicked(int x, int y) {
+        if (movingTiles == null) {
+            mouseX = x;
+            mouseY = y;
+
+            for (int i = 0; i < tileSets.size() && movingTiles == null; i++) {
+                TileSet tileSet = tileSets.get(i);
+
+                if (tileSet.contains(x,y)){
+                    System.out.println("tileSet: " + tileSet.toString());
+                    movingTiles = tileSet;
+                    tileSets.remove(i);
+                    System.out.println("tileSets count: " + tileSets.size());
+                }
+            }
+            repaint();
+        }
+        repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -40,6 +114,11 @@ public class GamePanel extends JPanel {
         for (int i = tileSets.size()-1; i >= 0 ; i--) {
             TileSet tileSet = tileSets.get(i);
             tileSet.draw(g);
+        }
+
+        // draw moving tiles
+        if (movingTiles != null) {
+            movingTiles.draw(g);
         }
     }
 
