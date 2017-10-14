@@ -16,7 +16,6 @@ public class TileSet {
             String letter = word.substring(i, i+1);
             LetterTile tile = new LetterTile(letter);
             tiles.add(tile);
-
             this.x = x;
             this.y = y;
         }
@@ -57,7 +56,6 @@ public class TileSet {
             String s2 =  tile.getLetter();
             s += s2;
         }
-        System.out.println("X: " + getX() + " Y: " + getY());
         return s;
     }
 

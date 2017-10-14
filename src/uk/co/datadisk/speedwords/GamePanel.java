@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,9 +17,9 @@ public class GamePanel extends JPanel {
     private static final int WIDTH = 500;
     private static final int HEIGHT = 300;
 
-    public static final int START_X = WIDTH / 2 - 7 * LetterTile.SIZE / 2;
-    public static final int START_Y = HEIGHT / 2 - LetterTile.SIZE / 2;
-    public static final String FILE_NAME = "/enable1_7.txt";
+    private static final int START_X = WIDTH / 2 - 7 * LetterTile.SIZE / 2;
+    private static final int START_Y = HEIGHT / 2 - LetterTile.SIZE / 2;
+    private static final String FILE_NAME = "/enable1_7.txt";
 
     private SpeedWords speedWords;
     private ArrayList<TileSet> tileSets = new ArrayList<>();
@@ -50,7 +51,7 @@ public class GamePanel extends JPanel {
             }
         });
 
-        addMouseListener(new MouseAdapter() {
+        addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 int x = e.getX();
@@ -69,7 +70,6 @@ public class GamePanel extends JPanel {
             mouseY = y;
             repaint();
         }
-        repaint();
     }
 
     private void released() {
@@ -102,13 +102,12 @@ public class GamePanel extends JPanel {
             }
             repaint();
         }
-        repaint();
     }
 
     public void paintComponent(Graphics g) {
         // draw background
         g.setColor(SpeedWords.TAN);
-        g.drawRect(0,0, WIDTH, HEIGHT);
+        g.fillRect(0,0, WIDTH, HEIGHT);
 
         // draw all current tile sets
         for (int i = tileSets.size()-1; i >= 0 ; i--) {

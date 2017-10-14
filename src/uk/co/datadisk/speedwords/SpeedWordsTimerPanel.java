@@ -1,6 +1,5 @@
 package uk.co.datadisk.speedwords;
 
-import uk.co.datadisk.mytimer.MyTimer;
 import uk.co.datadisk.mytimer.TimerPanel;
 
 import java.awt.*;
@@ -13,7 +12,7 @@ public class SpeedWordsTimerPanel extends TimerPanel {
 
     private SpeedWords speedWords;
 
-    public SpeedWordsTimerPanel(long time, SpeedWords speedWords) {
+    public SpeedWordsTimerPanel(SpeedWords speedWords, long time ) {
         super(time, FONT);
         this.speedWords = speedWords;
     }

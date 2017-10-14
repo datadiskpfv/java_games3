@@ -21,9 +21,9 @@ public class LetterTile extends JPanel {
     private static final int LETTER_POINTS[] = {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,10,1,1,1,1,4,4,8,4,10};
 
     private String letter;
-    private BufferedImage image;
-    FontMetrics bigFM = getFontMetrics(BIG_FONT);
-    FontMetrics smallFM = getFontMetrics(SMALL_FONT);
+    private static BufferedImage image;
+    private FontMetrics bigFM = getFontMetrics(BIG_FONT);
+    private FontMetrics smallFM = getFontMetrics(SMALL_FONT);
     private int points;
 
     public LetterTile(String letter) {

@@ -13,7 +13,7 @@ public class SpeedWords extends JFrame {
     private static final Font LIST_FONT = new Font(Font.DIALOG, Font.BOLD, 14);
 
     private ScorePanel scorePanel = new ScorePanel(0, TAN);
-    private SpeedWordsTimerPanel swTimerPanel = new SpeedWordsTimerPanel(60, this);
+    private SpeedWordsTimerPanel swTimerPanel = new SpeedWordsTimerPanel(this, 60);
 
     private JTextArea textArea = new JTextArea();
     private GamePanel gamePanel = new GamePanel(this);
@@ -26,7 +26,7 @@ public class SpeedWords extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     private void initGUI() {
@@ -53,6 +53,7 @@ public class SpeedWords extends JFrame {
         JPanel timerPanel = new JPanel();
         timerPanel.setBackground(Color.red);
         leftPanel.add(timerPanel);
+
         swTimerPanel.setBackground(Color.red);
         timerPanel.add(swTimerPanel);
 
