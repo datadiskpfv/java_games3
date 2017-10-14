@@ -42,7 +42,9 @@ public class GamePanel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 int x = e.getX();
                 int y = e.getY();
-                clicked(x,y);
+                int mouseButton = e.getButton();
+                boolean leftClicked = MouseEvent.BUTTON1 == mouseButton;
+                clicked(x,y, leftClicked);
             }
 
             @Override
@@ -75,6 +77,16 @@ public class GamePanel extends JPanel {
     private void released() {
         // if dropped on other tiles, connect it to the tiles
         if (movingTiles != null) {
+            boolean addedToTiles = false;
+            for (int i = 0; i < tileSets.size() && !addedToTiles; i++) {
+                TileSet tileSet = tileSets.get(i);
+                addedToTiles = tileSet.insertTiles(movingTiles);
+                if (addedToTiles) {
+                    movingTiles = null;
+                }
+            }
+        }
+        if (movingTiles != null) {
             String s = movingTiles.toString();
             int x = movingTiles.getX();
             int y = movingTiles.getY();
@@ -85,7 +97,7 @@ public class GamePanel extends JPanel {
         repaint();
     }
 
-    private void clicked(int x, int y) {
+    private void clicked(int x, int y, boolean leftClicked) {
         if (movingTiles == null) {
             mouseX = x;
             mouseY = y;
@@ -94,10 +106,15 @@ public class GamePanel extends JPanel {
                 TileSet tileSet = tileSets.get(i);
 
                 if (tileSet.contains(x,y)){
-                    System.out.println("tileSet: " + tileSet.toString());
-                    movingTiles = tileSet;
-                    tileSets.remove(i);
-                    System.out.println("tileSets count: " + tileSets.size());
+                    if (leftClicked) {
+                        movingTiles = tileSet.removeAndReturn1TileAt(x, y);
+                        if (tileSet.getNumberOfTiles() == 0) {
+                            tileSets.remove(i);
+                        }
+                    } else {
+                        movingTiles = tileSet;
+                        tileSets.remove(i);
+                    }
                 }
             }
             repaint();
