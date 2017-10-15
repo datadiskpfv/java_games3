@@ -10,6 +10,7 @@ public class TileSet {
 
     private int x = 0;
     private int y = 0;
+    private boolean valid = false;
 
     public TileSet(String word, int x, int y) {
         for (int i = 0; i < word.length(); i++) {
@@ -22,6 +23,15 @@ public class TileSet {
     }
 
     public void draw(Graphics g) {
+        if(valid) {
+            g.setColor(Color.YELLOW);
+            int borderX = x - HIGHLIGHT_WIDTH;
+            int borderY = y - HIGHLIGHT_WIDTH;
+            int borderWidth = getWidth() + (HIGHLIGHT_WIDTH * 2);
+            int borderHeight = LetterTile.SIZE + (HIGHLIGHT_WIDTH * 2);
+            g.fillRect(borderX, borderY, borderWidth, borderHeight);
+        }
+
         for (int i = 0; i < tiles.size(); i++) {
             LetterTile tile = tiles.get(i);
             int xPos = x + (LetterTile.SIZE  * i);
@@ -133,5 +143,19 @@ public class TileSet {
             }
         }
         return inserted;
+    }
+
+    public void setValid(boolean valid){
+        this.valid = valid;
+    }
+
+    public int getPoints() {
+        int points = 0;
+        for (int i = 0; i < tiles.size(); i++) {
+            LetterTile tile = tiles.get(i);
+            points += tile.getPoints();
+        }
+        points = points * tiles.size();
+        return points;
     }
 }

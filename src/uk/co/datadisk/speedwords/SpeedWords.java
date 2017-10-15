@@ -4,6 +4,7 @@ import uk.co.datadisk.mycomponents.TitleLabel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SpeedWords extends JFrame {
 
@@ -27,6 +28,8 @@ public class SpeedWords extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        swTimerPanel.start();
     }
 
     private void initGUI() {
@@ -72,6 +75,19 @@ public class SpeedWords extends JFrame {
         mainPanel.add(scrollPanel);
     }
 
+    public void addToScore(int newPoints) {
+        scorePanel.addToScore(newPoints);
+    }
+
+    public void setWordList(ArrayList<String> wordList) {
+        String s = "";
+        for (int i = 0; i < wordList.size(); i++) {
+            String word = wordList.get(i);
+            s += word + "\n";
+        }
+        textArea.setText(s);
+    }
+
     public static void main(String[] args) {
         try {
             String className = UIManager.getCrossPlatformLookAndFeelClassName();
@@ -81,5 +97,21 @@ public class SpeedWords extends JFrame {
         }
 
         EventQueue.invokeLater(SpeedWords::new);
+    }
+
+    public void outOfTime() {
+        gamePanel.setOutOfTime(true);
+
+        String message = "Time's up Do you want to play again?";
+        int option = JOptionPane.showConfirmDialog(this, message, "Play again?", JOptionPane.YES_NO_OPTION);
+        if( option == JOptionPane.YES_OPTION){
+            textArea.setText("");
+            scorePanel.reset();
+            gamePanel.restart();
+            swTimerPanel.setTime(60);
+            swTimerPanel.start();
+        } else {
+            System.exit(0);
+        }
     }
 }

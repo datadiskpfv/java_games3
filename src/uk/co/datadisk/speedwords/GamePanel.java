@@ -1,5 +1,6 @@
 package uk.co.datadisk.speedwords;
 
+import jdk.nashorn.internal.scripts.JO;
 import uk.co.datadisk.mycommonmethods.FileIO;
 
 import javax.swing.*;
@@ -29,6 +30,10 @@ public class GamePanel extends JPanel {
     private TileSet movingTiles;
     private int mouseX;
     private int mouseY;
+
+    private Dictionary dictionary = new Dictionary();
+    private ArrayList<String> formedWords = new ArrayList<>();
+    private boolean outOfTime = false;
 
     public GamePanel(SpeedWords speedWords) {
 
@@ -83,6 +88,7 @@ public class GamePanel extends JPanel {
                 addedToTiles = tileSet.insertTiles(movingTiles);
                 if (addedToTiles) {
                     movingTiles = null;
+                    checkWord(tileSet);
                 }
             }
         }
@@ -92,13 +98,15 @@ public class GamePanel extends JPanel {
             int y = movingTiles.getY();
             TileSet newTileSet = new TileSet(s, x, y);
             tileSets.add(0,newTileSet);
+            tileSets.add(newTileSet);
             movingTiles = null;
+            checkWord(newTileSet);
         }
         repaint();
     }
 
     private void clicked(int x, int y, boolean leftClicked) {
-        if (movingTiles == null) {
+        if (movingTiles == null && !outOfTime) {
             mouseX = x;
             mouseY = y;
 
@@ -110,6 +118,9 @@ public class GamePanel extends JPanel {
                         movingTiles = tileSet.removeAndReturn1TileAt(x, y);
                         if (tileSet.getNumberOfTiles() == 0) {
                             tileSets.remove(i);
+                        }
+                        else {
+                            checkWord(tileSet);
                         }
                     } else {
                         movingTiles = tileSet;
@@ -144,13 +155,59 @@ public class GamePanel extends JPanel {
         return size;
     }
 
-    private void restart() {
+    public void restart() {
         tileSets.clear();
+        formedWords.clear();
         int range = sevenLetterWords.size();
         int choose = rand.nextInt(range);
         String s = sevenLetterWords.get(choose);
         TileSet tileSet = new TileSet(s, START_X, START_Y);
         tileSets.add(tileSet);
+        checkWord(tileSet);
+        outOfTime = false;
+        movingTiles = null;
         repaint();
+    }
+
+    private void checkWord(TileSet tileSet) {
+        String s = tileSet.toString();
+        boolean isAWord = dictionary.isAWord(s);
+        boolean foundBefore = formedWords.contains(s);
+        if(isAWord && !foundBefore) {
+            tileSet.setValid(true);
+            int points = tileSet.getPoints();
+            speedWords.addToScore(points);
+
+            // if this is the first word found
+            // add it to the list
+            if (formedWords.size() == 0) {
+                formedWords.add(s);
+            } else {
+                // otherwise, insert word before the
+                // first word it is alphabetically less than
+                boolean added = false;
+                for (int i = 0; i < formedWords.size() && !added; i++) {
+                    String formedWord = formedWords.get(i);
+                    if (s.compareTo(formedWord) < 0){
+                        formedWords.add(i, s);
+                        added = true;
+                    }
+                }
+
+                // if the word is not less than any of the words
+                // add it to the end of the list
+                if (!added) {
+                    formedWords.add(s);
+                }
+            }
+
+            speedWords.setWordList(formedWords);
+        } else {
+            tileSet.setValid(false);
+        }
+    }
+
+    public void setOutOfTime(boolean outOfTime){
+        this.outOfTime = outOfTime;
     }
 }
