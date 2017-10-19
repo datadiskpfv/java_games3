@@ -12,6 +12,8 @@ public class MatchThree extends JFrame {
 
     ScorePanel scorePanel = new ScorePanel(0, Color.GREEN);
 
+    private BallPanel ballPanel = new BallPanel(this);
+
     private MatchThree() {
         initGUI();
 
@@ -38,7 +40,7 @@ public class MatchThree extends JFrame {
 
 
         // ball panel
-
+        mainPanel.add(ballPanel);
 
         // button panel
 
