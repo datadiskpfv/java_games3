@@ -33,4 +33,30 @@ public class Cell {
             g.fillOval(x+8, y+8, SIZE-16, SIZE-16);
         }
     }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setEmpty() {
+        color = -1;
+        inChain = false;
+    }
+
+    public boolean isEmpty() {
+        return color == -1;
+    }
+
+    public boolean isInChain() {
+        return inChain;
+    }
+
+    public void setInChain(boolean inChain){
+        this.inChain = inChain;
+    }
+
+    public void copy( Cell cell){
+        color = cell.getColor();
+        inChain = false;
+    }
 }
