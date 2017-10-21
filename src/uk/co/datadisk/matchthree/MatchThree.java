@@ -5,6 +5,8 @@ import uk.co.datadisk.speedwords.ScorePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MatchThree extends JFrame {
 
@@ -43,9 +45,31 @@ public class MatchThree extends JFrame {
         mainPanel.add(ballPanel);
 
         // button panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.BLACK);
+        mainPanel.add(buttonPanel);
 
+        JButton hintButton = new JButton("Hint");
+        hintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHint();
+            }
+        });
+        buttonPanel.add(hintButton);
+    }
 
+    private void showHint() {
+        ballPanel.showHint();
+    }
 
+    public void addToScore(int newPoints) {
+        scorePanel.addToScore(newPoints);
+    }
+
+    public void restart() {
+        scorePanel.reset();
+        ballPanel.setInitialBalls();
     }
 
     public static void main(String[] args) {
