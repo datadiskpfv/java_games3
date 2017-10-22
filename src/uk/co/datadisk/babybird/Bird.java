@@ -70,4 +70,33 @@ public class Bird {
             flap = FLAP_GLIDE;
         }
     }
+
+    public Rectangle getBounds() {
+        Rectangle bounds = new Rectangle(x,y,width,height);
+        return bounds;
+    }
+
+    public BufferedImage getImage() {
+        return birds[FLAP_GLIDE];
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getChangeY() {
+        return (int) changeY;
+    }
 }
