@@ -10,7 +10,7 @@ public class FallingBricks extends JFrame {
     private static final long serialVersionUID = -1181206630042541237L;
 
     ScorePanel scorePanel = new ScorePanel(0, Color.CYAN);
-    BricksPanel bricksPanel = new BricksPanel();
+    BricksPanel bricksPanel = new BricksPanel(this);
 
     public FallingBricks() {
         initGUI();
@@ -40,6 +40,16 @@ public class FallingBricks extends JFrame {
         mainPanel.add(bricksPanel);
     }
 
+    public void addToScore(int points) {
+        scorePanel.addToScore(points);
+    }
+
+    public void restart() {
+        scorePanel.reset();
+        bricksPanel.start();
+
+    }
+
     public static void main(String[] args) {
         try {
             String className = UIManager.getCrossPlatformLookAndFeelClassName();
@@ -50,5 +60,4 @@ public class FallingBricks extends JFrame {
 
         EventQueue.invokeLater(FallingBricks::new);
     }
-
 }

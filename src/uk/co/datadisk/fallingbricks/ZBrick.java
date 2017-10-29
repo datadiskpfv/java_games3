@@ -5,19 +5,19 @@ import uk.co.datadisk.mycommonmethods.FileIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class SBrick extends Brick {
-    private static final String BRICK_FILE = "/images/redBrick.jpg";
+public class ZBrick extends Brick {
+    private static final String BRICK_FILE = "/images/pinkBrick.jpg";
     private static final boolean TILES[][][] =
-        {
-          { {false, true, true},{true, true, false} },
-          { {true, false}, {true, true}, {false, true} }
-        };
+            {
+                    { {true, true, false},{false, true, true} },
+                    { {false, true}, {true, true}, {true, false} }
+            };
 
 
     private int state = 0;
     public static BufferedImage image;
 
-    public SBrick(int row, int col) {
+    public ZBrick(int row, int col) {
         super(row, col);
 
         if(image == null){
