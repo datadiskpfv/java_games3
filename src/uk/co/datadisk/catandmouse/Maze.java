@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Maze {
 
     public static final int CELL_SIZE = 30;
+
     private static final String FILE_NAME = "/maze.txt";
     private static final int HALF_CELL_SIZE = CELL_SIZE / 2;
     private static final int QUARTER_CELL_SIZE = CELL_SIZE / 4;
@@ -188,5 +189,31 @@ public class Maze {
                 }
             }
         }
+    }
+
+    public int getCatX() {
+        return catCol * CELL_SIZE;
+    }
+
+    public int getCatY() {
+        return catRow * CELL_SIZE;
+    }
+
+    public Rectangle getBounds(int x, int y){
+        x -= x % CELL_SIZE;
+        Rectangle bounds = new Rectangle(x, y, CELL_SIZE, CELL_SIZE);
+        return bounds;
+    }
+
+    public int getNumberOfExtraMice() {
+        return extraMiceX.size();
+    }
+
+    public int getExtraMouseX(int index){
+        return extraMiceX.get(index);
+    }
+
+    public int getExtraMouseY(int index){
+        return extraMiceY.get(index);
     }
 }

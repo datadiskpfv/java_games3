@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.security.Key;
 
 public class GamePanel extends JPanel {
@@ -21,6 +22,11 @@ public class GamePanel extends JPanel {
     private Maze maze;
     private Mouse mouse;
     private Timer timer;
+    private Cat cat;
+    private int numberOfExtraMice;
+    private BufferedImage mouseImage;
+    private int mouseOffsetX;
+    private int mouseOffsetY;
 
     public GamePanel(ScorePanel scorePanel) {
         this.scorePanel = scorePanel;
@@ -32,19 +38,13 @@ public class GamePanel extends JPanel {
         initGUI();
 
         mouse = new Mouse(this, maze);
+        cat = new Cat(mouse, maze);
+        numberOfExtraMice = maze.getNumberOfExtraMice();
+        mouseImage = mouse.getFirstImage();
+        mouseOffsetX = mouse.getFirstOffsetX();
+        mouseOffsetY = mouse.getFirstOffsetY();
 
-        //timer
-        timer = new Timer(60, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timeAction();
-            }
-        });
-    }
-
-    private void timeAction() {
-        mouse.move();
-        repaint();
+        timer.start();
     }
 
     private void initGUI() {
@@ -74,21 +74,59 @@ public class GamePanel extends JPanel {
                 if(direction != Mouse.DIRECTION_NONE){
                     mouse.turn(direction);
                     mouse.setState(mouse.STATE_RUN);
+                    cat.setState(cat.STATE_HUNT);
                     repaint();
                 }
             }
 
-            public void KeyReleased(KeyEvent e) {
+            @Override
+            public void keyReleased(KeyEvent e) {
                 int code = e.getKeyCode();
                 if (code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN || code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_LEFT){
                     mouse.setState(mouse.STATE_WAIT);
+                    cat.setState(cat.STATE_WANDER);
                     repaint();
                 }
             }
         });
 
-        // timer
+        //timer
+        timer = new Timer(60, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeAction();
+            }
+        });
     }
+
+    private void timeAction() {
+        mouse.move();
+        cat.move();
+        repaint();
+
+        Rectangle catBounds = cat.getBounds();
+        Rectangle mouseBounds = mouse.getBounds();
+        if(catBounds.intersects(mouseBounds)){
+            nextMouse();
+        }
+    }
+
+    private void nextMouse() {
+        timer.stop();
+        numberOfExtraMice--;
+
+        if(numberOfExtraMice >= 0){
+            String message = "You got caught!";
+            JOptionPane.showMessageDialog(this, message);
+            mouse = new Mouse(this, maze);
+            cat = new Cat(mouse, maze);
+            timer.start();
+        } else {
+            String message = "No more mice";
+            endGame(message);
+        }
+    }
+
 
     @Override
     public Dimension getPreferredSize() {
@@ -97,8 +135,9 @@ public class GamePanel extends JPanel {
     }
 
     public void paintComponent(Graphics g){
+        // background
         g.setColor(Color.GREEN);
-        g.drawRect(0,0, width, height);
+        g.fillRect(0,0, width, height);
 
         // maze
         maze.draw(g);
@@ -107,8 +146,14 @@ public class GamePanel extends JPanel {
         mouse.draw(g);
 
         // extra mice
+        for (int i = 0; i < numberOfExtraMice; i++) {
+            int x = maze.getExtraMouseX(i) + mouseOffsetX;
+            int y = maze.getExtraMouseY(i) + mouseOffsetY;
+            g.drawImage(mouseImage, x, y, null);
+        }
 
         // cat
+        cat.draw(g);
     }
 
     public void increaseScore() {
@@ -136,6 +181,7 @@ public class GamePanel extends JPanel {
         maze.reset();
         scorePanel.reset();
         mouse = new Mouse(this, maze);
+        numberOfExtraMice = maze.getNumberOfExtraMice();
         timer.start();
     }
 }

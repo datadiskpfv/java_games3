@@ -69,11 +69,13 @@ public abstract class MazeRunner {
     }
 
     public void setState(State newState) {
-        // exit the last state before
-        // switching to new state
-        state.exit();
-        state = newState;
-        state.enter();
+        if(newState != state){
+            // exit the last state before
+            // switching to new state
+            state.exit();
+            state = newState;
+            state.enter();
+        }
     }
 
     protected boolean wallInDirection(int direction){
@@ -101,7 +103,6 @@ public abstract class MazeRunner {
         if (maze.wallAt(checkX, checkY)) {
             wall = true;
         }
-
         return wall;
     }
 
@@ -137,4 +138,10 @@ public abstract class MazeRunner {
         }
     }
 
+    public Rectangle getBounds() {
+        int width = image[direction].getWidth();
+        int height = image[direction].getHeight();
+        Rectangle bounds = new Rectangle(x, y, width, height);
+        return bounds;
+    }
 }

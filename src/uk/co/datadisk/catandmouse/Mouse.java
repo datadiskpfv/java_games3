@@ -1,6 +1,7 @@
 package uk.co.datadisk.catandmouse;
 
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Mouse extends MazeRunner {
@@ -44,6 +45,9 @@ public class Mouse extends MazeRunner {
     }
 
     public void run() {
+        if (foundCheese()){
+            eatCheese();
+        }
         if(!wallInDirection(direction)) {
             x += changeX * speed;
             y += changeY * speed;
@@ -66,5 +70,25 @@ public class Mouse extends MazeRunner {
             foundCheese = true;
         }
         return foundCheese;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+    public BufferedImage getFirstImage() {
+        return image[0];
+    }
+
+    public int getFirstOffsetX() {
+        return offsetX[0];
+    }
+
+    public int getFirstOffsetY() {
+        return offsetY[0];
     }
 }
