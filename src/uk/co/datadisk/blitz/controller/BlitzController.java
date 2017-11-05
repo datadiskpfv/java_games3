@@ -5,7 +5,12 @@ import uk.co.datadisk.blitz.view.GamePanel;
 import uk.co.datadisk.mycommonmethods.FileIO;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class BlitzController {
@@ -31,11 +36,6 @@ public class BlitzController {
 
         gamePanel = window.getGamePanel();
 
-        // test code
-        Random rand = new Random();
-        int numberOfCards = SUITS * RANKS;
-        int pick = rand.nextInt(numberOfCards);
-        gamePanel.setDiscard(cardImages[pick]);
     }
 
     private void readCardImages() {
@@ -50,6 +50,85 @@ public class BlitzController {
             }
         }
         cardImages[CARD_BACK_INDEX] = FileIO.readImageFile(this, CARD_BACK_FILE);
+    }
+
+    public ActionListener getDealListener() {
+        ActionListener dealListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                window.enableDealButton(false);
+                window.setDealButtonText("Next Player");
+
+                // test code
+                Random rand = new Random();
+                int numberOfCards = SUITS * RANKS;
+                int pick = rand.nextInt(numberOfCards);
+                gamePanel.setDiscard(cardImages[pick]);
+
+                gamePanel.setPlayer(0, "Paul", 3);
+                gamePanel.setPlayer(1, "Lorraine", 0);
+                gamePanel.setPlayer(2, "Jessica", -1);
+
+                // pick 3 random cards for each player
+                for (int p = 0; p < NUMBER_OF_PLAYERS; p++) {
+                    ArrayList<BufferedImage> newCards = new ArrayList<>();
+                    for (int c = 0; c < 3; c++) {
+                        pick = rand.nextInt(numberOfCards);
+                        newCards.add(cardImages[pick]);
+                    }
+                    gamePanel.updateCardsForPlayer(p, newCards);
+                }
+
+                gamePanel.addInfoForPlayer(0, "Rapped");
+
+                BufferedImage movingCardImage = cardImages[12];
+                gamePanel.moveDeckToPlayer(movingCardImage, 1, 3);
+                gamePanel.moveDiscardToPlayer(movingCardImage, 0, 0);
+                gamePanel.movePlayerToDiscard(movingCardImage, 2, 1);
+                gamePanel.moveDeckToDiscard(movingCardImage);
+                gamePanel.updateTokensForPlayer(0, 1);
+                gamePanel.addInfoForPlayer(0, "Lost 2");
+                gamePanel.clearCardsAndInfo();
+            }
+        };
+
+        return dealListener;
+    }
+
+    public ActionListener getRapListener() {
+        ActionListener rapListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                window.enableRapButton(false);
+            }
+        };
+        return rapListener;
+    }
+
+    public MouseAdapter getMouseAdapter() {
+        MouseAdapter adapter = new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                clicked(x,y);
+            }
+        };
+        return adapter;
+    }
+
+    private void clicked(int x, int y) {
+        if(gamePanel.hasDeckAt(x,y)){
+            System.out.println("The deck was clicked");
+        }
+        if(gamePanel.hasDiscardAt(x, y)){
+            System.out.println("The discard was clicked");
+        }
+
+        int clickedCard = gamePanel.getCardIndexForPlayerAt(2, x, y);
+        if(clickedCard > -1){
+            System.out.println("Clicked card: " + clickedCard);
+        }
     }
 
     public static void main(String[] args) {
