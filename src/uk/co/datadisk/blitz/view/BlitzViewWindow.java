@@ -49,6 +49,7 @@ public class BlitzViewWindow extends JFrame {
 
         ActionListener rapListener = controller.getRapListener();
         rapButton.addActionListener(rapListener);
+        rapButton.setEnabled(false);
         buttonPanel.add(rapButton);
     }
 
