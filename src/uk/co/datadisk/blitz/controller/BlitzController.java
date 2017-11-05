@@ -1,10 +1,12 @@
 package uk.co.datadisk.blitz.controller;
 
 import uk.co.datadisk.blitz.view.BlitzViewWindow;
+import uk.co.datadisk.blitz.view.GamePanel;
 import uk.co.datadisk.mycommonmethods.FileIO;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 public class BlitzController {
 
@@ -18,6 +20,7 @@ public class BlitzController {
     private static final int NUMBER_OF_PLAYERS = 3;
     private static final int NUMBER_OF_IMAGES = SUITS * RANKS + 1;
     private BufferedImage cardImages[] = new BufferedImage[NUMBER_OF_IMAGES];
+    private GamePanel gamePanel;
 
     private BlitzViewWindow window;
 
@@ -25,6 +28,14 @@ public class BlitzController {
 
         readCardImages();
         window = new BlitzViewWindow(this, cardImages[CARD_BACK_INDEX]);
+
+        gamePanel = window.getGamePanel();
+
+        // test code
+        Random rand = new Random();
+        int numberOfCards = SUITS * RANKS;
+        int pick = rand.nextInt(numberOfCards);
+        gamePanel.setDiscard(cardImages[pick]);
     }
 
     private void readCardImages() {

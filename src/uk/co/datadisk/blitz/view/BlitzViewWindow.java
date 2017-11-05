@@ -37,4 +37,8 @@ public class BlitzViewWindow extends JFrame {
 
         // button panel
     }
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
+    }
 }
