@@ -109,11 +109,27 @@ public class BlitzModel {
     }
 
     private void computerDraw() {
-
+        int[] testPoints = player.getPointsInSuits();
+        for (int i = 0; i < testPoints.length; i++) {
+            System.out.println(player.getName() + " has " + testPoints[i] + " in suit " + i);
+        }
+        int pointsInHand = player.getPointsInHand();
+        System.out.println("points in hand = " + pointsInHand);
     }
 
     private void nextPlayer() {
-
+        active = (active + 1) % numberOfPlayers;
+        player = players[active];
+        if(player.isOut()){
+            state = STATE_NEXT_PLAYER;
+        } else if (player.hasRapped()){
+            state = STATE_SETTLE_RAP;
+        } else if (player.isHuman()){
+            state = STATE_MY_TURN_DRAW;
+            controller.showMyTurn();
+        } else {
+            state = STATE_COMPUTER_DRAW;
+        }
     }
 
     private void deal() {
@@ -149,5 +165,9 @@ public class BlitzModel {
         controller.showNewHand();
         state = STATE_DEAL;
         play();
+    }
+
+    public boolean hasSomeoneRapped() {
+        return someoneRapped;
     }
 }

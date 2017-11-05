@@ -101,4 +101,29 @@ public class Player {
         }
         return position;
     }
+
+    public int[] getPointsInSuits() {
+        int[] pointsInSuits = new int[4];
+
+        // add the points in each suit
+        for (int i = 0; i < cards.size(); i++) {
+            Card card = cards.get(i);
+            int suit = card.getSuit();
+            pointsInSuits[suit] += card.getValue();
+        }
+        return pointsInSuits;
+    }
+
+    public int getPointsInHand() {
+        int[] pointsInSuits = getPointsInSuits();
+
+        // get points for the suit that has most points
+        int highestPoints = pointsInSuits[0];
+        for (int i = 1; i < pointsInSuits.length; i++) {
+            if (pointsInSuits[i] > highestPoints){
+                highestPoints = pointsInSuits[i];
+            }
+        }
+        return highestPoints;
+    }
 }

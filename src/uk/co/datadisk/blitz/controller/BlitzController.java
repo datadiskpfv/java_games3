@@ -167,4 +167,10 @@ public class BlitzController {
         gamePanel.moveDeckToDiscard(cardImage);
         gamePanel.setDiscard(cardImage);
     }
+
+    public void showMyTurn() {
+        if (!model.hasSomeoneRapped()){
+            window.enableRapButton(true);
+        }
+    }
 }
