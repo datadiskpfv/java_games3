@@ -1,5 +1,7 @@
 package uk.co.datadisk.blitz.model;
 
+import java.util.ArrayList;
+
 public class Player {
     private static final int NUMBER_OF_TOKEN = 3;
 
@@ -9,6 +11,7 @@ public class Player {
     private boolean show = true;
     private int tokens = NUMBER_OF_TOKEN;
     private boolean rapped = false;
+    private ArrayList<Card> cards = new ArrayList<>();
 
     public Player(int id, String name, boolean human, boolean show) {
         this.id = id;
@@ -59,5 +62,43 @@ public class Player {
 
     public boolean isOut() {
         return tokens < 0;
+    }
+
+    public ArrayList<Card> getCards() {
+        return cards;
+    }
+
+    public void startNewHand() {
+        rapped = false;
+        cards.clear();
+    }
+
+    public int addCard(Card newCard){
+        int i = 0;
+        int numberOfCards = cards.size();
+        boolean done = false;
+        while(i < numberOfCards && !done){
+            Card card = cards.get(i);
+            if(newCard.isGreaterThan(card)){
+                i++;
+            } else {
+                done = true;
+            }
+        }
+        cards.add(i, newCard);
+        return i;
+    }
+
+    public int getCardPosition(Card checkCard){
+        int position = -1;
+        int checkId = checkCard.getId();
+        for (int i = 0; i < cards.size() && position == -1; i++) {
+            Card card = cards.get(i);
+            int id = card.getId();
+            if(id == checkId){
+                position = i;
+            }
+        }
+        return position;
     }
 }
