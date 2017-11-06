@@ -105,16 +105,24 @@ public class BlitzController {
     }
 
     private void clicked(int x, int y) {
-        if(gamePanel.hasDeckAt(x,y)){
-            System.out.println("The deck was clicked");
-        }
-        if(gamePanel.hasDiscardAt(x, y)){
-            System.out.println("The discard was clicked");
-        }
-
-        int clickedCard = gamePanel.getCardIndexForPlayerAt(2, x, y);
-        if(clickedCard > -1){
-            System.out.println("Clicked card: " + clickedCard);
+        int state = model.getState();
+        switch(state){
+            case BlitzModel.STATE_MY_TURN_DRAW:
+                if (gamePanel.hasDeckAt(x, y)){
+                    model.myPlayerDrewCard();
+                    window.enableRapButton(false);
+                } else if (gamePanel.hasDiscardAt(x, y)){
+                    model.myPlayerTookDiscard();
+                    window.enableRapButton(false);
+                }
+                break;
+            case BlitzModel.STATE_MY_TURN_DISCARD:
+                int myPlayerId = model.getMyPlayerId();
+                int cardIndex = gamePanel.getCardIndexForPlayerAt(myPlayerId, x, y);
+                if(cardIndex > -1){
+                    model.myPlayerDiscard(cardIndex);
+                }
+                break;
         }
     }
 
@@ -172,5 +180,41 @@ public class BlitzController {
         if (!model.hasSomeoneRapped()){
             window.enableRapButton(true);
         }
+    }
+
+    public void showTakeDiscard(Player player, Card discard, Card nextDiscard) {
+        BufferedImage nextDiscardImage = null;
+        if (nextDiscard !=  null){
+            int nextDiscardId = nextDiscard.getId();
+            nextDiscardImage = cardImages[nextDiscardId];
+        }
+        int discardId = discard.getId();
+        BufferedImage discardImage = cardImages[discardId];
+        int playerId = player.getId();
+        int position = player.getCardPosition(discard);
+        ArrayList<BufferedImage> playerCards = createCardImageForPlayer(player);
+        gamePanel.setDiscard(nextDiscardImage);
+        gamePanel.moveDiscardToPlayer(discardImage, playerId, position);
+        gamePanel.updateCardsForPlayer(playerId, playerCards);
+    }
+
+    public void showRap(Player player) {
+        int playerId = player.getId();
+        gamePanel.addInfoForPlayer(playerId, "Rapped");
+    }
+
+    public void showDiscard(Player player, Card card, int position) {
+        int cardId = card.getId();
+        BufferedImage cardImage = cardImages[cardId];
+        int playerId = player.getId();
+        ArrayList<BufferedImage> playerCardImages = createCardImageForPlayer(player);
+        gamePanel.updateCardsForPlayer(playerId, playerCardImages);
+        gamePanel.movePlayerToDiscard(cardImage, playerId, position);
+        gamePanel.setDiscard(cardImage);
+    }
+
+    public void showBlitz(Player player) {
+        int playerId = player.getId();
+        gamePanel.addInfoForPlayer(playerId, "Blitz");
     }
 }

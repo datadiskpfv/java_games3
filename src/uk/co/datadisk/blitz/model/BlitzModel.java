@@ -5,17 +5,17 @@ import uk.co.datadisk.blitz.controller.BlitzController;
 import java.util.Random;
 
 public class BlitzModel {
-    private static final int STATE_WAIT_FOR_INPUT = 0;
-    private static final int STATE_NEW_HAND = 1;
-    private static final int STATE_DEAL = 2;
-    private static final int STATE_COMPUTER_DRAW = 3;
-    private static final int STATE_COMPUTER_DISCARD = 4;
-    private static final int STATE_NEXT_PLAYER = 5;
-    private static final int STATE_MY_TURN_DRAW = 6;
-    private static final int STATE_MY_TURN_DISCARD = 7;
-    private static final int STATE_SETTLE_RAP = 8;
-    private static final int STATE_SETTLE_BLITZ = 9;
-    private static final int STATE_END_OF_HAND = 10;
+    public static final int STATE_WAIT_FOR_INPUT = 0;
+    public static final int STATE_NEW_HAND = 1;
+    public static final int STATE_DEAL = 2;
+    public static final int STATE_COMPUTER_DRAW = 3;
+    public static final int STATE_COMPUTER_DISCARD = 4;
+    public static final int STATE_NEXT_PLAYER = 5;
+    public static final int STATE_MY_TURN_DRAW = 6;
+    public static final int STATE_MY_TURN_DISCARD = 7;
+    public static final int STATE_SETTLE_RAP = 8;
+    public static final int STATE_SETTLE_BLITZ = 9;
+    public static final int STATE_END_OF_HAND = 10;
 
     private BlitzController controller;
     private int numberOfPlayers;
@@ -101,20 +101,97 @@ public class BlitzModel {
     }
 
     private void settleRap() {
+        // find lowest points
+        int lowestPoints = 31;
+        for (int i = 0; i < numberOfPlayers; i++) {
+            if (!players[i].isOut()) {
+                int points = players[i].getPointsInHand();
+                if (points < lowestPoints){
+                    lowestPoints = points;
+                }
+            }
+        }
 
+        // if current player has lowest points
+        // he loses 2 tokens and no one else loses any
+        int rappedPlayersPoints = player.getPointsInHand();
+        if(rappedPlayersPoints == lowestPoints){
+            player.loseTokens(2);
+            controller.showLoseTokens(player 2);
+        } else {
+            // every player with lowest points
+            // loses one token
+            for (int i = 0; i < numberOfPlayers; i++) {
+                Player p = players[i];
+                if (i != active){
+                    if(!p.isOut() && p.getPointsInHand() == lowestPoints){
+                        p.loseTokens(1);
+                        controller.showLoseToken(p,1);
+                    }
+                }
+            }
+        }
+
+        dealerId = getNextDealerId();
+        Player dealer = players[dealerId];
+        controller.showDealer(dealer);
+        state = STATE_END_OF_HAND;
+        play();
     }
 
     private void computerDiscard() {
-
+        int lowestCardIndex = player.getLowestCardIndex();
+        Card discard = player.removeCardAt(lowestCardIndex);
+        playerDiscard(discard, lowestCardIndex);
     }
 
     private void computerDraw() {
-        int[] testPoints = player.getPointsInSuits();
-        for (int i = 0; i < testPoints.length; i++) {
-            System.out.println(player.getName() + " has " + testPoints[i] + " in suit " + i);
+        boolean shouldTakeDiscard = false;
+
+        // if the discard stack is not empty
+        if(!discardStack.isEmpty()) {
+            // check the points in the hand without the discard
+            int priorPoints = player.getPointsInHand();
+
+            // add the discard to the hand
+            Card discard = discardStack.getTopCard();
+            player.addCard(discard);
+
+            // remove the lowest card in the hand
+            int lowestCardIndex = player.getLowestCardIndex();
+            Card removedCard = player.removeCardAt(lowestCardIndex);
+
+            // check the points in the hand again
+            int afterPoints = player.getPointsInHand();
+
+            // if there are now more points, it improved the hand
+            if(priorPoints > afterPoints){
+                shouldTakeDiscard = true;
+            }
+
+            // put the cards back as they were
+            player.addCard(removedCard);
+            player.removeCard(discard);
         }
-        int pointsInHand = player.getPointsInHand();
-        System.out.println("points in hand = " + pointsInHand);
+
+        if (shouldTakeDiscard) {
+            Card discard = discardStack.removeTopCard();
+            player.addCard(discard);
+            Card nextDiscard = discardStack.getTopCard();
+            controller.showTakeDiscard(player, discard, nextDiscard);
+            state = STATE_COMPUTER_DISCARD;
+        } else if (!someoneRapped && player.shouldRap()){
+            someoneRapped = true;
+            player.rap();
+            controller.showRap(player);
+            state = STATE_NEXT_PLAYER;
+        } else {
+            Card card = deck.deal();
+            player.addCard(card);
+            controller.showDrawCard(player, card);
+            state = STATE_COMPUTER_DISCARD;
+        }
+        play();
     }
 
     private void nextPlayer() {
@@ -169,5 +246,57 @@ public class BlitzModel {
 
     public boolean hasSomeoneRapped() {
         return someoneRapped;
+    }
+
+    private void playerDiscard(Card discard, int removeCardIndex){
+        discardStack.add(discard);
+        controller.showDiscard(player, discard, removeCardIndex);
+        if (player.getPointsInHand() == 31){
+            controller.showBlitz(player);
+            state = STATE_SETTLE_BLITZ;
+        } else {
+            state = STATE_NEXT_PLAYER;
+        }
+        play();
+    }
+
+    public void myPlayerDrewCard() {
+        Card card = deck.deal();
+        player.addCard(card);
+        controller.showDrawCard(player, card);
+        state = STATE_MY_TURN_DISCARD;
+        play();
+    }
+
+    public void myPlayerTookDiscard() {
+        Card discard = discardStack.removeTopCard();
+        player.addCard(discard);
+        Card nextDiscard = discardStack.getTopCard();
+        controller.showTakeDiscard(player, discard, nextDiscard);
+        state = STATE_MY_TURN_DISCARD;
+        play();
+    }
+
+    public void myPlayerDiscard(int index){
+        Card discard = player.removeCardAt(index);
+        playerDiscard(discard, index);
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public int getNextDealerId() {
+        boolean done = false;
+        int nextDealerId = (dealerId + 1) % numberOfPlayers;
+
+        while(!done) {
+            if(!players[nextDealerId].isOut()){
+                done = true;
+            } else {
+                nextDealerId = (nextDealerId + 1) % numberOfPlayers;
+            }
+        }
+        return nextDealerId;
     }
 }
