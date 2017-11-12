@@ -40,7 +40,7 @@ public class BlitzModel {
         int computerPlayers = numberOfPlayers - 1;
         for (int id = 0; id < computerPlayers; id++) {
             String name = "Player " + (id + 1);
-            players[id] = new Player(id, name, false, true);
+            players[id] = new Player(id, name, false, false);
         }
         players[myPlayerId] = new Player(myPlayerId, "You", true, true);
         dealerId = rand.nextInt(numberOfPlayers);
@@ -61,26 +61,34 @@ public class BlitzModel {
     public void play() {
         switch(state){
             case STATE_NEW_HAND:
+                System.out.println("PLAY: STATE_NEW_HAND");
                 newHand();
                 break;
             case STATE_DEAL:
+                System.out.println("PLAY: STATE_DEAL");
                 deal();
             case STATE_NEXT_PLAYER:
+                System.out.println("PLAY: STATE_NEXT_PLAYER");
                 nextPlayer();
                 break;
             case STATE_COMPUTER_DRAW:
+                System.out.println("PLAY: STATE_COMPUTER_DRAW");
                 computerDraw();
                 break;
             case STATE_COMPUTER_DISCARD:
+                System.out.println("PLAY: STATE_COMPUTER_DISCARD");
                 computerDiscard();
                 break;
             case STATE_SETTLE_RAP:
+                System.out.println("PLAY: STATE_SETTLE_RAP");
                 settleRap();
                 break;
             case STATE_SETTLE_BLITZ:
+                System.out.println("PLAY: STATE_SETTLE_BLITZ");
                 settleBlitz();
                 break;
             case STATE_END_OF_HAND:
+                System.out.println("PLAY: STATE_NEW_HAND");
                 endOfHand();
                 break;
 
@@ -93,11 +101,41 @@ public class BlitzModel {
     }
 
     private void endOfHand() {
-
+        Player playerNotOut = players[0];
+        int count = 0;
+        for (int i = 0; i < numberOfPlayers; i++) {
+            players[i].setShow(true);
+            controller.showUpdatedCards(players[i]);
+            if (players[i].isOut()){
+                count++;
+            } else {
+                playerNotOut = players[i];
+            }
+        }
+        if( count == numberOfPlayers - 1){
+            controller.showEndGame(playerNotOut);
+        }
+        state = STATE_WAIT_FOR_INPUT;
+        play();
     }
 
     private void settleBlitz() {
-
+        for (int i = 0; i < numberOfPlayers; i++) {
+            if ( i != active){
+                if(players[i].hasRapped()) {
+                    players[i].loseTokens(2);
+                    controller.showLoseTokens(players[i], 2);
+                } else if (!players[i].isOut()){
+                    players[i].loseTokens(1);
+                    controller.showLoseTokens(players[i], 1);
+                }
+            }
+        }
+        dealerId = getNextDealerId();
+        Player dealer = players[dealerId];
+        controller.showDealer(dealer);
+        state = STATE_END_OF_HAND;
+        play();
     }
 
     private void settleRap() {
@@ -117,7 +155,7 @@ public class BlitzModel {
         int rappedPlayersPoints = player.getPointsInHand();
         if(rappedPlayersPoints == lowestPoints){
             player.loseTokens(2);
-            controller.showLoseTokens(player 2);
+            controller.showLoseTokens(player, 2);
         } else {
             // every player with lowest points
             // loses one token
@@ -126,7 +164,7 @@ public class BlitzModel {
                 if (i != active){
                     if(!p.isOut() && p.getPointsInHand() == lowestPoints){
                         p.loseTokens(1);
-                        controller.showLoseToken(p,1);
+                        controller.showLoseTokens(p,1);
                     }
                 }
             }
@@ -146,6 +184,7 @@ public class BlitzModel {
     }
 
     private void computerDraw() {
+        System.out.println("Computer Draw");
         boolean shouldTakeDiscard = false;
 
         // if the discard stack is not empty
@@ -207,9 +246,12 @@ public class BlitzModel {
         } else {
             state = STATE_COMPUTER_DRAW;
         }
+        play();
     }
 
     private void deal() {
+        boolean blitz = false;
+
         // deal 3 cards to each player
         for (int c = 0; c < 3; c++) {
             for (int p = 0; p < numberOfPlayers; p++) {
@@ -218,9 +260,29 @@ public class BlitzModel {
                     Card card = deck.deal();
                     players[dealTo].addCard(card);
                     controller.showDrawCard(players[dealTo], card);
+
+                    if (c == 2){
+                        int pointsInHand = players[dealTo].getPointsInHand();
+                        if(pointsInHand == 31){
+                            blitz = true;
+                            active = dealTo;
+                            controller.showBlitz(players[dealTo]);
+                            state = STATE_SETTLE_BLITZ;
+                        }
+                    }
+
                 }
             }
         }
+
+        if (!blitz) {
+            // deal a discard
+            Card card = deck.deal();
+            discardStack.add(card);
+            controller.showDealDiscard(card);
+            state = STATE_NEXT_PLAYER;
+        }
+        play();
 
         // deal a discard
         Card card = deck.deal();
@@ -282,6 +344,14 @@ public class BlitzModel {
         playerDiscard(discard, index);
     }
 
+    public void myPlayerRapped() {
+        someoneRapped = true;
+        player.rap();
+        controller.showRap(player);
+        state = STATE_NEXT_PLAYER;
+        play();
+    }
+
     public int getState() {
         return state;
     }
@@ -298,5 +368,11 @@ public class BlitzModel {
             }
         }
         return nextDealerId;
+    }
+
+    public void reset() {
+        for (int i = 0; i < numberOfPlayers; i++) {
+            players[i].reset();
+        }
     }
 }

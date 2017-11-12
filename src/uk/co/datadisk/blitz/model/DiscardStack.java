@@ -37,6 +37,4 @@ public class DiscardStack {
         }
         return topCard;
     }
-
-
 }

@@ -13,9 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class BlitzController {
 
@@ -87,6 +85,7 @@ public class BlitzController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 window.enableRapButton(false);
+                model.myPlayerRapped();
             }
         };
         return rapListener;
@@ -216,5 +215,38 @@ public class BlitzController {
     public void showBlitz(Player player) {
         int playerId = player.getId();
         gamePanel.addInfoForPlayer(playerId, "Blitz");
+    }
+
+    public void showDealer(Player dealer) {
+        String name = dealer.getName();
+        String dealText  = name + " Deal";
+        window.setDealButtonText(dealText);
+        window.enableDealButton(true);
+    }
+
+    public void showEndGame(Player winner) {
+        String name = winner.getName();
+        String message = name + " won!, Do you want to play again?";
+        int option = JOptionPane.showConfirmDialog(null, message, "Play Again?", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION){
+            model.reset();
+            start();
+        } else {
+            System.exit(0);
+        }
+    }
+
+    public void showUpdatedCards(Player player) {
+        int playerId = player.getId();
+        ArrayList<BufferedImage> playerCardImages = createCardImageForPlayer(player);
+        gamePanel.updateCardsForPlayer(playerId, playerCardImages);
+    }
+
+    public void showLoseTokens(Player player, int count) {
+        int playerId = player.getId();
+        int totalTokens = player.getTokens();
+        gamePanel.updateTokensForPlayer(playerId, totalTokens);
+        String info = "Lost " + count;
+        gamePanel.addInfoForPlayer(playerId, info);
     }
 }

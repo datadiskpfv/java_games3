@@ -4,8 +4,6 @@ import uk.co.datadisk.blitz.controller.BlitzController;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.management.BufferPoolMXBean;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PlayerView {

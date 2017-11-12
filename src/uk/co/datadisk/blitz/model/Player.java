@@ -74,6 +74,9 @@ public class Player {
     public void startNewHand() {
         rapped = false;
         cards.clear();
+        if(!human){
+            show = false;
+        }
     }
 
     public int addCard(Card newCard){
@@ -192,5 +195,13 @@ public class Player {
             }
         }
         return shouldRap;
+    }
+
+    public void reset() {
+        tokens = NUMBER_OF_TOKEN;
+
+        if(!human){
+            show = false;
+        }
     }
 }
